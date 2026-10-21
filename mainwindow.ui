@@ -49,7 +49,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="netlineEdit1"/>
+        <widget class="QLineEdit" name="netlineEditip"/>
        </item>
       </layout>
      </item>
@@ -75,7 +75,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="netlineEdit2"/>
+        <widget class="QLineEdit" name="netlineEdithost"/>
        </item>
       </layout>
      </item>
@@ -88,7 +88,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>21</height>
+     <height>30</height>
     </rect>
    </property>
   </widget>
@@ -109,7 +109,7 @@
   <action name="actionnetbtn">
    <property name="icon">
     <iconset resource="resource.qrc">
-     <normaloff>:/img/close.png</normaloff>:/img/close.png</iconset>
+     <normaloff>:/img/client.png</normaloff>:/img/client.png</iconset>
    </property>
    <property name="text">
     <string>netbtn</string>

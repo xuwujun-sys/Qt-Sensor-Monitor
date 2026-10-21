@@ -23,7 +23,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QTextBrowser" name="textBrowsersend">
+  <widget class="QTextEdit" name="textEditsend">
    <property name="geometry">
     <rect>
      <x>0</x>

@@ -598,9 +598,26 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionNetworkSwitch" />
    <addaction name="actionnetbtn" />
+   <addaction name="actionLed" />
    <addaction name="actiondebug" />
   </widget>
+  <action name="actionNetworkSwitch">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/img/close.png</normaloff>:/img/close.png</iconset>
+   </property>
+   <property name="text">
+    <string>网络开关</string>
+   </property>
+   <property name="toolTip">
+    <string>网络已关闭；点击开启</string>
+   </property>
+  </action>
   <action name="actionnetbtn">
    <property name="icon">
     <iconset resource="resource.qrc">
@@ -608,6 +625,24 @@
    </property>
    <property name="text">
     <string>netbtn</string>
+   </property>
+  </action>
+  <action name="actionLed">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/img/led_off.png</normaloff>:/img/led_off.png</iconset>
+   </property>
+   <property name="text">
+    <string>LED 开关</string>
+   </property>
+   <property name="toolTip">
+    <string>点击发送开灯指令</string>
    </property>
   </action>
   <action name="actiondebug">

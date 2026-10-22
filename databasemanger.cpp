@@ -1,5 +1,4 @@
 #include "databasemanger.h"
-#include <QSqlRecord>
 #include <QUuid>
 
 DataBaseManger::DataBaseManger(QObject *parent) : QObject(parent)
@@ -71,16 +70,23 @@ bool DataBaseManger::select(QList<QVariantMap> &rows)
 {
     rows.clear();
     QSqlQuery query(m_db);
-    const bool result = execute(query, "SELECT id, collect_time, temperature, humidity, light, soil, smoke, rain "
-                                       "FROM sensordata ORDER BY collect_time DESC, id DESC", {});
 
-    const QSqlRecord record = query.record();
-    while (query.next())
-    {
-        QVariantMap row;
-        for (int i = 0; i < record.count(); ++i)
-            row.insert(record.fieldName(i), query.value(i));
-        rows.append(row);
+    bool result = query.exec(
+        "SELECT * FROM sensordata "
+        "ORDER BY collect_time DESC, id DESC"
+    );
+
+    while (query.next()) {
+        rows.append({
+            {"id",           query.value("id")},
+            {"collect_time", query.value("collect_time")},
+            {"temperature",  query.value("temperature")},
+            {"humidity",     query.value("humidity")},
+            {"light",        query.value("light")},
+            {"soil",         query.value("soil")},
+            {"smoke",        query.value("smoke")},
+            {"rain",         query.value("rain")}
+        });
     }
 
     return result;

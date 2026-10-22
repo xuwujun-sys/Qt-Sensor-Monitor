@@ -569,11 +569,60 @@
      </widget>
     </item>
     <item row="1" column="1">
-     <spacer name="futureControlsSpacer">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-     </spacer>
+     <layout class="QVBoxLayout" name="lightControlLayout">
+      <item>
+       <widget class="QGroupBox" name="lightControlGroupBox">
+        <property name="title">
+         <string>光强控制</string>
+        </property>
+        <layout class="QVBoxLayout" name="lightControlContentsLayout">
+         <item>
+          <widget class="QLabel" name="lightPwmValueLabel">
+           <property name="text">
+            <string>0%</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSlider" name="lightSlider">
+           <property name="maximum">
+            <number>100</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="setLightButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>设定</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <spacer name="futureControlsSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

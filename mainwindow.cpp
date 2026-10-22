@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "historywidget.h"
 #include "ui_mainwindow.h"
 #include "ui_form.h"
 #include "QTcpServer"
@@ -23,6 +24,15 @@ MainWindow::MainWindow(QWidget *parent)
     Ui::Form* fui = m_form->get_ui();
     ui->setupUi(this);
     initCharts();
+    // 历史数据窗口：通过工具栏的数据库图标打开。
+    auto history = new HistoryWidget(this);
+    history->setWindowFlag(Qt::Window);
+    auto historyAction = ui->toolBar->addAction(QIcon(":/img/data.png"), "历史数据");
+    connect(historyAction, &QAction::triggered, this, [history]() {
+        history->show();
+        history->raise();
+        history->activateWindow();
+    });
     ui->netlineEditip->setText("127.0.0.1");
     ui->netlineEdithost->setText("9494");
     m_socket->setProxy(QNetworkProxy::NoProxy);
@@ -86,6 +96,19 @@ MainWindow::MainWindow(QWidget *parent)
         ui->actionLed->setToolTip(checked ? "点击发送关灯指令" : "点击发送开灯指令");
     });
 
+    // 光强控制：拖动时显示百分比，点击“设定”才发送指令。
+    connect(ui->lightSlider, &QSlider::valueChanged, this, [this](int value) {
+        ui->lightPwmValueLabel->setText(QString::number(value) + "%");
+    });
+    connect(ui->setLightButton, &QPushButton::clicked, this, [this]() {
+        const QString command = "Pwm:" + QString::number(ui->lightSlider->value());
+        // 与 LED 一样，服务器模式发给最后接入的客户端。
+        QTcpSocket* socket = isServerMode
+                ? (m_socket_l.isEmpty() ? nullptr : m_socket_l.last()) : m_socket;
+        if (socket)
+            socket->write(command.toUtf8());
+    });
+
     // 7. 网络总开关：开启时连接或监听，关闭时断开所有连接。
     connect(ui->actionNetworkSwitch, &QAction::toggled, this, [this](bool enabled) {
         if (enabled) {
@@ -111,6 +134,7 @@ MainWindow::MainWindow(QWidget *parent)
         ui->actionNetworkSwitch->setToolTip(enabled ? "网络已开启；点击关闭" : "网络已关闭；点击开启");
         ui->actionnetbtn->setEnabled(!enabled);
         ui->actionLed->setEnabled(enabled);
+        ui->setLightButton->setEnabled(enabled);
         ui->netlineEditip->setEnabled(!enabled);
         ui->netlineEdithost->setEnabled(!enabled);
     });

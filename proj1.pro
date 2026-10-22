@@ -1,4 +1,4 @@
-QT       += core gui network
+QT       += core gui charts network sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -11,11 +11,14 @@ CONFIG += c++11
 SOURCES += \
     form.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    tcpphraser.cpp
 
 HEADERS += \
     form.h \
-    mainwindow.h
+    mainwindow.h \
+    sensordata.h \
+    tcpphraser.h
 
 FORMS += \
     form.ui \

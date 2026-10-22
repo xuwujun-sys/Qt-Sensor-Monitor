@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>950</width>
     <height>600</height>
    </rect>
   </property>
@@ -14,85 +14,580 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QGroupBox" name="netgroupBox">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>20</y>
-      <width>211</width>
-      <height>141</height>
-     </rect>
+   <layout class="QGridLayout" name="centralLayout" columnstretch="0,1" rowstretch="0,1">
+    <property name="horizontalSpacing">
+     <number>20</number>
     </property>
-    <property name="title">
-     <string>网络配置</string>
+    <property name="verticalSpacing">
+     <number>16</number>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <item>
-        <widget class="QLabel" name="netlabel1">
-         <property name="maximumSize">
-          <size>
-           <width>32</width>
-           <height>32</height>
-          </size>
+    <item row="0" column="0" alignment="Qt::AlignTop">
+     <layout class="QHBoxLayout" name="configurationAndSensorsLayout" stretch="0,0">
+      <property name="spacing">
+       <number>16</number>
+      </property>
+      <item alignment="Qt::AlignTop">
+       <widget class="QGroupBox" name="netgroupBox">
+        <property name="minimumSize">
+         <size>
+          <width>220</width>
+          <height>140</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>260</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="title">
+         <string>网络配置</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QLabel" name="netlabel1">
+             <property name="maximumSize">
+              <size>
+               <width>32</width>
+               <height>32</height>
+              </size>
+             </property>
+             <property name="text">
+              <string />
+             </property>
+             <property name="pixmap">
+              <pixmap resource="resource.qrc">:/img/ip.png</pixmap>
+             </property>
+             <property name="scaledContents">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="netlineEditip" />
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLabel" name="netlabel2">
+             <property name="maximumSize">
+              <size>
+               <width>32</width>
+               <height>32</height>
+              </size>
+             </property>
+             <property name="text">
+              <string />
+             </property>
+             <property name="pixmap">
+              <pixmap resource="resource.qrc">:/img/duan.png</pixmap>
+             </property>
+             <property name="scaledContents">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="netlineEdithost" />
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignTop">
+       <widget class="QGroupBox" name="sensorGroupBox">
+        <property name="minimumSize">
+         <size>
+          <width>190</width>
+          <height>210</height>
+         </size>
+        </property>
+        <property name="title">
+         <string>传感器监测</string>
+        </property>
+        <layout class="QGridLayout" name="sensorGridLayout" columnstretch="1,1,1" rowstretch="1,1">
+         <property name="horizontalSpacing">
+          <number>4</number>
          </property>
-         <property name="text">
-          <string/>
+         <property name="verticalSpacing">
+          <number>4</number>
          </property>
-         <property name="pixmap">
-          <pixmap resource="resource.qrc">:/img/ip.png</pixmap>
+         <item row="0" column="0">
+          <layout class="QVBoxLayout" name="temperatureLayout">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <item alignment="Qt::AlignHCenter">
+            <widget class="QLabel" name="temperatureIconLabel">
+             <property name="minimumSize">
+              <size>
+               <width>30</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="text">
+              <string />
+             </property>
+             <property name="pixmap">
+              <pixmap resource="resource.qrc">:/img/temp.png</pixmap>
+             </property>
+             <property name="scaledContents">
+              <bool>true</bool>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="temperatureTitleLabel">
+             <property name="text">
+              <string>温度</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+              </font>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="temperatureValueLabel">
+             <property name="font">
+              <font>
+               <pointsize>11</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>N/A</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="0" column="1">
+          <layout class="QVBoxLayout" name="humidityLayout">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <item alignment="Qt::AlignHCenter">
+            <widget class="QLabel" name="humidityIconLabel">
+             <property name="minimumSize">
+              <size>
+               <width>30</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="text">
+              <string />
+             </property>
+             <property name="pixmap">
+              <pixmap resource="resource.qrc">:/img/humi.png</pixmap>
+             </property>
+             <property name="scaledContents">
+              <bool>true</bool>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="humidityTitleLabel">
+             <property name="text">
+              <string>空气湿度</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+              </font>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="humidityValueLabel">
+             <property name="font">
+              <font>
+               <pointsize>11</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>N/A</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="0" column="2">
+          <layout class="QVBoxLayout" name="lightLayout">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <item alignment="Qt::AlignHCenter">
+            <widget class="QLabel" name="lightIconLabel">
+             <property name="minimumSize">
+              <size>
+               <width>30</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="text">
+              <string />
+             </property>
+             <property name="pixmap">
+              <pixmap resource="resource.qrc">:/img/light.png</pixmap>
+             </property>
+             <property name="scaledContents">
+              <bool>true</bool>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="lightTitleLabel">
+             <property name="text">
+              <string>光照</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+              </font>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="lightValueLabel">
+             <property name="font">
+              <font>
+               <pointsize>11</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>N/A</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="0">
+          <layout class="QVBoxLayout" name="soilLayout">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <item alignment="Qt::AlignHCenter">
+            <widget class="QLabel" name="soilIconLabel">
+             <property name="minimumSize">
+              <size>
+               <width>30</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="text">
+              <string />
+             </property>
+             <property name="pixmap">
+              <pixmap resource="resource.qrc">:/img/humi_soil.png</pixmap>
+             </property>
+             <property name="scaledContents">
+              <bool>true</bool>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="soilTitleLabel">
+             <property name="text">
+              <string>土壤湿度</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+              </font>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="soilValueLabel">
+             <property name="font">
+              <font>
+               <pointsize>11</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>N/A</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="1">
+          <layout class="QVBoxLayout" name="smokeLayout">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <item alignment="Qt::AlignHCenter">
+            <widget class="QLabel" name="smokeIconLabel">
+             <property name="minimumSize">
+              <size>
+               <width>30</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="text">
+              <string />
+             </property>
+             <property name="pixmap">
+              <pixmap resource="resource.qrc">:/img/mq2.png</pixmap>
+             </property>
+             <property name="scaledContents">
+              <bool>true</bool>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="smokeTitleLabel">
+             <property name="text">
+              <string>烟雾</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+              </font>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="smokeValueLabel">
+             <property name="font">
+              <font>
+               <pointsize>11</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>N/A</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="2">
+          <layout class="QVBoxLayout" name="rainLayout">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <item alignment="Qt::AlignHCenter">
+            <widget class="QLabel" name="rainIconLabel">
+             <property name="minimumSize">
+              <size>
+               <width>30</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="text">
+              <string />
+             </property>
+             <property name="pixmap">
+              <pixmap resource="resource.qrc">:/img/rain.png</pixmap>
+             </property>
+             <property name="scaledContents">
+              <bool>true</bool>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="rainTitleLabel">
+             <property name="text">
+              <string>雨量</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+              </font>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="rainValueLabel">
+             <property name="font">
+              <font>
+               <pointsize>11</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>N/A</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <property name="leftMargin">
+          <number>6</number>
          </property>
-         <property name="scaledContents">
-          <bool>true</bool>
+         <property name="topMargin">
+          <number>6</number>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="netlineEditip"/>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLabel" name="netlabel2">
-         <property name="maximumSize">
-          <size>
-           <width>32</width>
-           <height>32</height>
-          </size>
+         <property name="rightMargin">
+          <number>6</number>
          </property>
-         <property name="text">
-          <string/>
+         <property name="bottomMargin">
+          <number>6</number>
          </property>
-         <property name="pixmap">
-          <pixmap resource="resource.qrc">:/img/duan.png</pixmap>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="netlineEdithost"/>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </widget>
+        </layout>
+        <property name="maximumSize">
+         <size>
+          <width>190</width>
+          <height>210</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="0" column="1">
+     <widget class="QtCharts::QChartView" name="graphicsView">
+      <property name="minimumSize">
+       <size>
+        <width>420</width>
+        <height>230</height>
+       </size>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="toolTip">
+       <string>温度 / 空气湿度 / 光照</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QtCharts::QChartView" name="graphicsView_2">
+      <property name="minimumSize">
+       <size>
+        <width>426</width>
+        <height>230</height>
+       </size>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="toolTip">
+       <string>土壤湿度 / 烟雾 / 雨量</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <spacer name="futureControlsSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </spacer>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>950</width>
      <height>30</height>
     </rect>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusbar" />
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
     <string>toolBar</string>
@@ -103,8 +598,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionnetbtn"/>
-   <addaction name="actiondebug"/>
+   <addaction name="actionnetbtn" />
+   <addaction name="actiondebug" />
   </widget>
   <action name="actionnetbtn">
    <property name="icon">
@@ -125,8 +620,15 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QtCharts::QChartView</class>
+   <extends>QGraphicsView</extends>
+   <header location="global">QtCharts/QChartView</header>
+  </customwidget>
+ </customwidgets>
  <resources>
-  <include location="resource.qrc"/>
+  <include location="resource.qrc" />
  </resources>
- <connections/>
+ <connections />
 </ui>

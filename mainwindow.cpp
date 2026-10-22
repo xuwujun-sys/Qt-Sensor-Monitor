@@ -12,17 +12,21 @@ MainWindow::MainWindow(QWidget *parent)
     , m_server(new QTcpServer)
     , m_socket(new QTcpSocket)
     , m_socket_l(QVector<QTcpSocket*>())
+    , m_tcpphraser(new TcpPhraser)
 {
     Ui::Form* fui = m_form->get_ui();
     ui->setupUi(this);
-    ui->netlineEditip->setText("192.168.236.25");
+    ui->netlineEditip->setText("127.0.0.1");
     ui->netlineEdithost->setText("9494");
     m_socket->setProxy(QNetworkProxy::NoProxy);
 
     {
         m_clientReadConnection = connect(m_socket, &QTcpSocket::readyRead, this, [=]() {
 
-            fui->textBrowserrecv->append("服务器收到:" + m_socket->readAll());
+            const QByteArray data = m_socket->readAll();
+            fui->textBrowserrecv->append("服务器收到:" + QString::fromUtf8(data));
+            m_tcpphraser->append_data(data);
+            m_tcpphraser->analyze();
 
         });
 
@@ -37,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     //连接工具栏的开关和点击事件
-    connect(ui->actionnetbtn, &QAction::triggered, this, [&](){
+    connect(ui->actionnetbtn, &QAction::triggered, this, [this, fui](){
         disconnect(m_serverConnection);
         disconnect(m_sendConnection);
         disconnect(m_clientReadConnection);
@@ -58,9 +62,10 @@ MainWindow::MainWindow(QWidget *parent)
                 m_socket_l_count++;
                 // 服务器接收数据
                 connect(m_socket_l[index], &QTcpSocket::readyRead, this, [=]() {
-                    //qDebug() << "服务器收到:" << socket->readAll();
-
-                    fui->textBrowserrecv->append("服务器收到:" +m_socket_l[index]->readAll());
+                    const QByteArray data = m_socket_l[index]->readAll();
+                    fui->textBrowserrecv->append("服务器收到:" + QString::fromUtf8(data));
+                    m_tcpphraser->append_data(data);
+                    m_tcpphraser->analyze();
 
                 });
 
@@ -89,7 +94,10 @@ MainWindow::MainWindow(QWidget *parent)
 
             m_clientReadConnection = connect(m_socket, &QTcpSocket::readyRead, this, [=]() {
 
-                fui->textBrowserrecv->append("服务器收到:" + m_socket->readAll());
+                const QByteArray data = m_socket->readAll();
+                fui->textBrowserrecv->append("服务器收到:" + QString::fromUtf8(data));
+                m_tcpphraser->append_data(data);
+                m_tcpphraser->analyze();
 
             });
 
@@ -108,6 +116,24 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actiondebug, &QAction::triggered, this, [&](){
             m_form->show();
     });
+
+    //连接解析完成湿度等并且跟新标签
+    connect(m_tcpphraser, &TcpPhraser::sensorDataParsed,
+            this, [this](double temp,
+                         double humi,
+                         double light,
+                         double soil,
+                         double mq2,
+                         double rain)
+    {
+        ui->temperatureValueLabel->setText(QString::number(temp));
+        ui->humidityValueLabel->setText(QString::number(humi));
+        ui->lightValueLabel->setText(QString::number(light));
+        ui->soilValueLabel->setText(QString::number(soil));
+        ui->smokeValueLabel->setText(QString::number(mq2));
+        ui->rainValueLabel->setText(QString::number(rain));
+    });
+
 
 }
 

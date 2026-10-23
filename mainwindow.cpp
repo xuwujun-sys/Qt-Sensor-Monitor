@@ -10,29 +10,43 @@
 #include <QDateTime>
 #include <QPainter>
 #include <QTimer>
+#include "historywidget.h"
+#include "ui_historywidget.h"
+#include <QHeaderView>
+#include <QStandardItemModel>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , m_form(new Form)
-    , m_server(new QTcpServer)
-    , m_socket(new QTcpSocket)
+    , m_form(new Form(this))
+    , m_history(new HistoryWidget(this))
+    , m_server(new QTcpServer(this))
+    , m_socket(new QTcpSocket(this))
     , m_socket_l(QVector<QTcpSocket*>())
-    , m_tcpphraser(new TcpPhraser)
+    , m_tcpphraser(new TcpPhraser(this))
+    , m_databasemanger(new DataBaseManger(this))
+
 {
     // 1. 准备主界面、调试窗口控件和图表，填写默认 IP 与端口。
     Ui::Form* fui = m_form->get_ui();
     ui->setupUi(this);
     initCharts();
+    m_databasemanger->open(); // 启动时打开数据库，退出时由析构函数关闭。
+    connect(m_history, &HistoryWidget::refreshRequested,
+            this, &MainWindow::refreshHistory);
+    refreshHistory();
+
+
     // 历史数据窗口：通过工具栏的数据库图标打开。
-    auto history = new HistoryWidget(this);
-    history->setWindowFlag(Qt::Window);
-    auto historyAction = ui->toolBar->addAction(QIcon(":/img/data.png"), "历史数据");
-    connect(historyAction, &QAction::triggered, this, [history]() {
-        history->show();
-        history->raise();
-        history->activateWindow();
+    m_history->setWindowFlag(Qt::Window);
+
+    connect(ui->actionHistory, &QAction::triggered, this, [this]() {
+        m_history->show();
+        m_history->raise();
+        m_history->activateWindow();
     });
+
+
     ui->netlineEditip->setText("127.0.0.1");
     ui->netlineEdithost->setText("9494");
     m_socket->setProxy(QNetworkProxy::NoProxy);
@@ -76,6 +90,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // 5. 调试发送：网络开启且已经连接时，发送输入的消息。
     // 客户端模式发给服务器；服务器模式发给最后接入的客户端。
+    m_form->setWindowFlag(Qt::Window);
     connect(m_form, &Form::sendmsg, this, [this](QByteArray msg) {
         if (!ui->actionNetworkSwitch->isChecked())
             return;
@@ -160,6 +175,9 @@ MainWindow::MainWindow(QWidget *parent)
         ui->soilValueLabel->setText(QString::number(soil));
         ui->smokeValueLabel->setText(QString::number(mq2));
         ui->rainValueLabel->setText(QString::number(rain));
+
+        if (m_databasemanger->insert(m_sensorData))
+            refreshHistory();
     });
 
 
@@ -168,6 +186,28 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+// 查询全部记录，替换表格中的旧数据。
+void MainWindow::refreshHistory()
+{
+    QList<QVariantMap> rows;
+    if (!m_databasemanger->select(rows))
+        return;
+
+    auto model = m_history->get_model();
+    model->setRowCount(0); // 清空旧数据，保留表头。
+    for (const auto &row : rows) {
+        model->appendRow({
+            new QStandardItem(row["collect_time"].toDateTime().toString("yyyy-MM-dd hh:mm:ss")),
+            new QStandardItem(row["temperature"].toString()),
+            new QStandardItem(row["humidity"].toString()),
+            new QStandardItem(row["light"].toString()),
+            new QStandardItem(row["soil"].toString()),
+            new QStandardItem(row["smoke"].toString()),
+            new QStandardItem(row["rain"].toString())
+        });
+    }
 }
 
 // 创建两个图表，每个图表放三条曲线，再用定时器每秒添加数据点。

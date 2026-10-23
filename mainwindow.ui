@@ -651,6 +651,7 @@
    <addaction name="actionnetbtn" />
    <addaction name="actionLed" />
    <addaction name="actiondebug" />
+   <addaction name="actionHistory" />
   </widget>
   <action name="actionNetworkSwitch">
    <property name="checkable">
@@ -692,6 +693,18 @@
    </property>
    <property name="toolTip">
     <string>点击发送开灯指令</string>
+   </property>
+  </action>
+  <action name="actionHistory">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/img/data.png</normaloff>:/img/data.png</iconset>
+   </property>
+   <property name="text">
+    <string>历史数据</string>
+   </property>
+   <property name="toolTip">
+    <string>打开历史数据窗口</string>
    </property>
   </action>
   <action name="actiondebug">

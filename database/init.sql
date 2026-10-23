@@ -1,0 +1,16 @@
+-- 与 DataBaseManger 的连接配置、增删改查字段对应。
+CREATE DATABASE IF NOT EXISTS testindex
+    DEFAULT CHARACTER SET utf8mb4;
+
+USE testindex;
+
+CREATE TABLE IF NOT EXISTS sensordata (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    collect_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    temperature DOUBLE NOT NULL,
+    humidity DOUBLE NOT NULL,
+    light DOUBLE NOT NULL,
+    soil DOUBLE NOT NULL,
+    smoke DOUBLE NOT NULL,
+    rain DOUBLE NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

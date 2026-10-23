@@ -9,6 +9,8 @@
 #include "sensordata.h"
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QDateTimeAxis>
+#include "databasemanger.h"
+#include "historywidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -26,6 +28,7 @@ private:
     // 窗口
     Ui::MainWindow *ui;          // 主窗口里的按钮、标签、图表等控件
     Form* m_form;               // 收发消息用的调试窗口
+    HistoryWidget* m_history;
 
     // 网络通信
     bool isServerMode = false;  // false：客户端模式；true：服务器模式
@@ -43,5 +46,8 @@ private:
     QtCharts::QLineSeries* m_series[6]{};
     QtCharts::QDateTimeAxis* m_timeAxes[2]{}; // 两个图表各自的时间横坐标
     void initCharts();          // 创建曲线和坐标轴，设置每秒刷新
+
+    DataBaseManger* m_databasemanger;
+    void refreshHistory(); // 查询数据库并刷新历史表格。
 };
 #endif // MAINWINDOW_H

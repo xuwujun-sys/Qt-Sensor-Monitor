@@ -20,7 +20,7 @@ void DataBaseManger::init()
     m_db.setDatabaseName("Driver={MySQL ODBC 8.0 Unicode Driver};"
                        "Server=127.0.0.1;Port=3306;Database=testindex;");
     m_db.setUserName("root");
-    m_db.setPassword(qEnvironmentVariable("MYSQL_PASSWORD"));
+    m_db.setPassword("112233");
 }
 
 bool DataBaseManger::open()

@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
+        <file>style.qss</file>
+        <file>img/chevron-down.svg</file>
         <file>img/app.png</file>
         <file>img/auto.png</file>
         <file>img/bg.jpg</file>

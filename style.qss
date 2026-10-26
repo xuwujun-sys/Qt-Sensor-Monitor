@@ -1,0 +1,148 @@
+/* 全局：浅灰背景、深色文字，字体尺寸兼顾现有紧凑布局。 */
+QWidget {
+    font-family: "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
+    font-size: 12px;
+    color: #25334a;
+}
+QMainWindow, QWidget#centralwidget, QWidget#Form, QWidget#HistoryWidget {
+    background: #f3f6fa;
+}
+QLabel, QStackedWidget, QStackedWidget > QWidget {
+    background: transparent;
+}
+
+/* 工具栏：悬停、选中、禁用状态分别显示。 */
+QToolBar {
+    background: #ffffff;
+    border: none;
+    border-bottom: 1px solid #dfe6ef;
+    padding: 6px 10px;
+    spacing: 6px;
+}
+QToolButton {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 6px;
+}
+QToolButton:hover { background: #edf4ff; border-color: #c9dcf8; }
+QToolButton:checked { background: #dceaff; border-color: #98bdf2; }
+QToolButton:pressed { background: #cddfff; }
+QToolButton:disabled { background: #f4f6f9; }
+QStatusBar { background: #ffffff; border-top: 1px solid #dfe6ef; }
+QToolTip { background: #25334a; color: white; border: none; padding: 5px; }
+
+/* 功能分组：白色面板，标题保留在原布局位置。 */
+QGroupBox {
+    background: #ffffff;
+    border: 1px solid #dfe6ef;
+    border-radius: 8px;
+    margin-top: 10px;
+    padding: 10px 6px 6px;
+    font-weight: 600;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 12px;
+    padding: 0 5px;
+    color: #35547a;
+}
+QLabel#temperatureValueLabel, QLabel#humidityValueLabel,
+QLabel#lightValueLabel, QLabel#soilValueLabel,
+QLabel#smokeValueLabel, QLabel#rainValueLabel {
+    color: #2466bc;
+    font-size: 17px;
+    font-weight: 600;
+}
+QLabel#serialHintLabel, QLabel#serialFormatLabel { color: #718096; font-size: 11px; }
+QLabel#lightPwmValueLabel { color: #2466bc; font-size: 24px; font-weight: 600; }
+
+/* 输入控件：聚焦时强调边框，关闭通信后恢复可编辑外观。 */
+QLineEdit, QComboBox, QTextEdit, QTextBrowser {
+    background: #ffffff;
+    border: 1px solid #ced8e5;
+    border-radius: 5px;
+    padding: 4px 6px;
+    selection-background-color: #d4e5ff;
+    selection-color: #163d74;
+}
+QLineEdit:focus, QComboBox:focus, QTextEdit:focus { border-color: #4889df; }
+QLineEdit:disabled, QComboBox:disabled {
+    background: #f0f3f7;
+    color: #8a96a7;
+    border-color: #e0e6ef;
+}
+QComboBox { padding-right: 22px; }
+QComboBox::drop-down { width: 20px; border: none; }
+QComboBox::down-arrow { image: url(:/img/chevron-down.svg); width: 10px; height: 6px; }
+QComboBox QAbstractItemView {
+    background: #ffffff;
+    border: 1px solid #ced8e5;
+    selection-background-color: #e8f1ff;
+    selection-color: #2466bc;
+    outline: none;
+}
+QTextEdit, QTextBrowser { font-family: "Consolas", "Microsoft YaHei", monospace; }
+
+/* 按钮：普通操作用浅色，发送、刷新历史、光强设定用蓝色。 */
+QPushButton {
+    background: #ffffff;
+    border: 1px solid #cbd7e6;
+    border-radius: 5px;
+    padding: 4px 10px;
+    color: #35547a;
+}
+QPushButton:hover { background: #edf4ff; border-color: #82abe0; }
+QPushButton:pressed { background: #dceaff; }
+QPushButton#setLightButton, QPushButton#refreshButton, QPushButton#send {
+    background: #2e70ca;
+    border-color: #2e70ca;
+    color: #ffffff;
+}
+QPushButton#setLightButton:hover, QPushButton#refreshButton:hover,
+QPushButton#send:hover { background: #245daa; border-color: #245daa; }
+QPushButton:disabled, QPushButton#setLightButton:disabled {
+    background: #e9eef5;
+    border-color: #dde4ed;
+    color: #94a0b1;
+}
+/* 调试窗口使用固定坐标，小按钮采用紧凑内边距以免图标被挤压。 */
+QPushButton#send, QPushButton#exit { padding: 0 6px; }
+
+QSlider::groove:horizontal { height: 6px; border-radius: 3px; background: #e0e7f0; }
+QSlider::sub-page:horizontal { background: #4181d4; border-radius: 3px; }
+QSlider::handle:horizontal {
+    width: 14px;
+    margin: -5px 0;
+    border-radius: 7px;
+    background: #ffffff;
+    border: 2px solid #4181d4;
+}
+QSlider::handle:horizontal:hover { background: #e5efff; }
+
+/* 历史表格及图表容器。 */
+QTableView {
+    background: #ffffff;
+    alternate-background-color: #f5f8fc;
+    border: 1px solid #dfe6ef;
+    border-radius: 6px;
+    gridline-color: #e8edf4;
+    selection-background-color: #e1edff;
+    selection-color: #1e518f;
+}
+QTableView::item { padding: 4px; }
+QHeaderView::section {
+    background: #eaf0f8;
+    color: #35547a;
+    border: none;
+    border-right: 1px solid #dfe6ef;
+    border-bottom: 1px solid #dfe6ef;
+    padding: 8px 5px;
+    font-weight: 600;
+}
+QGraphicsView#graphicsView, QGraphicsView#graphicsView_2 {
+    background: #ffffff;
+    border: 1px solid #dfe6ef;
+    border-radius: 8px;
+}

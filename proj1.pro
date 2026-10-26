@@ -9,6 +9,8 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    tcpmanger.cpp \
+    sensorchart.cpp \
     databasemanger.cpp \
     historywidget.cpp \
     form.cpp \
@@ -17,6 +19,8 @@ SOURCES += \
     tcpphraser.cpp
 
 HEADERS += \
+    tcpmanger.h \
+    sensorchart.h \
     databasemanger.h \
     historywidget.h \
     form.h \

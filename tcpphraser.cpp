@@ -1,5 +1,6 @@
 #include "tcpphraser.h"
 #include <QHash>
+#include <QtMath>
 
 TcpPhraser::TcpPhraser(QObject *parent) : QObject(parent)
 {
@@ -59,7 +60,23 @@ void TcpPhraser::parseFrame(const QByteArray &body)
             continue;  // 跳过末尾逗号产生的空项
 
         const auto pair = field.split(':');
-        values[pair[0].trimmed()] = pair[1].toDouble();
+        // 先检查格式，再访问 pair[1]，避免字段没有冒号时越界。
+        if (pair.size() != 2 || pair[0].trimmed().isEmpty())
+            return;
+
+        bool ok = false;
+        const double value = pair[1].toDouble(&ok);
+        if (!ok || !qIsFinite(value))
+            return; // 非数字、空数值、NaN 和无穷大都不接收，正常的 0 可以接收。
+
+        values[pair[0].trimmed()] = value;
+    }
+
+    // 六项数据必须齐全，不能让缺少的字段默认为 0。
+    const char* keys[] = {"temp", "humi", "light", "soil", "mq2", "rain"};
+    for (const char* key : keys) {
+        if (!values.contains(key))
+            return;
     }
 
     emit sensorDataParsed(

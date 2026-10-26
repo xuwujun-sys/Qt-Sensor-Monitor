@@ -10,7 +10,7 @@ HistoryWidget::HistoryWidget(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // 先放好表头，后续接入数据库模型后显示真实数据。
+    // 模型只创建一次，刷新时保留表头并替换数据行。
     m_model->setHorizontalHeaderLabels({QStringLiteral("时间"), QStringLiteral("温度"),
         QStringLiteral("空气湿度"), QStringLiteral("光照"), QStringLiteral("土壤湿度"),
         QStringLiteral("烟雾"), QStringLiteral("雨量")});

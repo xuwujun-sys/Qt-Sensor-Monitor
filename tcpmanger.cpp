@@ -8,12 +8,11 @@ Tcpmanger::Tcpmanger(QObject *parent)
 {
     m_socket->setProxy(QNetworkProxy::NoProxy);
 
-    // 客户端收到数据后，通过信号交给主窗口。
     connect(m_socket, &QTcpSocket::readyRead, this, [this]() {
         emit dataReceived(m_socket->readAll());
     });
 
-    // 服务器接收新客户端，沿用原来的列表管理方式。
+    // 为每个客户端连接接收和断开事件，断开后移除并释放。
     connect(m_server, &QTcpServer::newConnection, this, [this]() {
         while (m_server->hasPendingConnections()) {
             QTcpSocket* socket = m_server->nextPendingConnection();
@@ -36,6 +35,7 @@ Tcpmanger::~Tcpmanger()
 
 void Tcpmanger::start(bool isServerMode, const QString &ip, quint16 port)
 {
+    // 先关闭旧连接，再按指定角色启动。
     stop();
     m_isServerMode = isServerMode;
     m_enabled = true;
@@ -60,7 +60,7 @@ void Tcpmanger::send(const QByteArray &data)
 {
     if (!m_enabled)
         return;
-    // 客户端发给服务器；服务器仍发给最后接入的客户端。
+    // 服务器统一发给最后接入的客户端，不按设备类型区分。
     QTcpSocket* socket = m_isServerMode
             ? (m_socket_l.isEmpty() ? nullptr : m_socket_l.last()) : m_socket;
     if (socket && socket->state() == QAbstractSocket::ConnectedState)

@@ -17,27 +17,34 @@ MainWindow::MainWindow(QWidget *parent)
     , m_tcpmanger(new Tcpmanger(this))
     , m_tcpphraser(new TcpPhraser(this))
     , m_sensorchart(new SensorChart(this))
-    , m_databasemanger(new DataBaseManger(this))
+    , m_databasemanger(new DataBaseManger)
+    , m_thread(new QThread(this))
 
 {
-    // 1. 准备主界面、调试窗口控件和图表，填写默认 IP 与端口。
     Ui::Form* fui = m_form->get_ui();
     ui->setupUi(this);
     m_sensorchart->initCharts(ui->graphicsView, ui->graphicsView_2);
-    // 主窗口决定何时更新；曲线类只负责绘图。
+    // 曲线每秒取最新值；没有新数据时，继续绘制上一次有效值。
     auto timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [this]() {
         if (m_hasSensorData)
             m_sensorchart->appendData(m_sensorData);
     });
     timer->start(1000);
-    m_databasemanger->open(); // 启动时打开数据库，退出时由析构函数关闭。
+    // 注册跨线程传递的数据类型，再把数据库对象移入工作线程。
+    qRegisterMetaType<SensorData>("SensorData");
+    qRegisterMetaType<QList<QVariantMap>>("QList<QVariantMap>");
+    m_databasemanger->moveToThread(m_thread);
+    connect(m_thread, &QThread::started, m_databasemanger, &DataBaseManger::initialize);
+    connect(m_thread, &QThread::finished, m_databasemanger, &QObject::deleteLater);
+    connect(this, &MainWindow::saveRequested, m_databasemanger, &DataBaseManger::saveData);
+    connect(this, &MainWindow::queryRequested, m_databasemanger, &DataBaseManger::queryData);
+    connect(m_databasemanger, &DataBaseManger::dataReady, this, &MainWindow::refreshHistory);
     connect(m_history, &HistoryWidget::refreshRequested,
-            this, &MainWindow::refreshHistory);
-    refreshHistory();
+            this, &MainWindow::queryRequested);
+    m_thread->start();
 
 
-    // 历史数据窗口：通过工具栏的数据库图标打开。
     m_history->setWindowFlag(Qt::Window);
 
     connect(ui->actionHistory, &QAction::triggered, this, [this]() {
@@ -50,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->netlineEditip->setText("127.0.0.1");
     ui->netlineEdithost->setText("9494");
 
-    // 2. 模式按钮：选择客户端或服务器，网络由总开关启动。
+    // 模式按钮只选择角色，网络由总开关启动。
     connect(ui->actionnetbtn, &QAction::triggered, this, [this]() {
         isServerMode = !isServerMode;
         ui->actionnetbtn->setIcon(QIcon(isServerMode ? ":/img/server.png" : ":/img/client.png"));
@@ -59,25 +66,23 @@ MainWindow::MainWindow(QWidget *parent)
     });
     ui->actionnetbtn->setToolTip("当前：客户端；点击切换为服务器");
 
-    // 3. TCP 收到数据后，主窗口显示消息并交给解析器。
+    // 原始消息都显示在调试窗口，只有解析有效的报文才更新传感器和数据库。
     connect(m_tcpmanger, &Tcpmanger::dataReceived, this, [this, fui](QByteArray data) {
         fui->textBrowserrecv->append("收到:" + QString::fromUtf8(data));
         m_tcpphraser->append_data(data);
         m_tcpphraser->analyze();
     });
 
-    // 4. 调试窗口只负责提供消息，发送目标由 TCP 类选择。
     m_form->setWindowFlag(Qt::Window);
     connect(m_form, &Form::sendmsg, m_tcpmanger, &Tcpmanger::send);
-    // 5. LED 按钮：checked 为 true 发开灯指令，为 false 发关灯指令。
-    // 灯泡图标表示按钮选择的状态，设备是否执行需要由设备端确认。
+    // 图标表示下发的开关状态，不代表设备已确认执行。
     connect(ui->actionLed, &QAction::triggered, this, [this](bool checked) {
         m_tcpmanger->send(checked ? "led_on" : "led_off");
         ui->actionLed->setIcon(QIcon(checked ? ":/img/led_on.png" : ":/img/led_off.png"));
         ui->actionLed->setToolTip(checked ? "点击发送关灯指令" : "点击发送开灯指令");
     });
 
-    // 光强控制：拖动时显示百分比，点击“设定”才发送指令。
+    // 拖动只更新显示，点击“设定”才下发光强。
     connect(ui->lightSlider, &QSlider::valueChanged, this, [this](int value) {
         ui->lightPwmValueLabel->setText(QString::number(value) + "%");
     });
@@ -86,17 +91,16 @@ MainWindow::MainWindow(QWidget *parent)
         m_tcpmanger->send(command.toUtf8());
     });
 
-    // 6. 网络总开关：开启时连接或监听，关闭时断开所有连接。
+    // 总开关控制网络启停；关闭时同时清空未解析完的报文。
     connect(ui->actionNetworkSwitch, &QAction::toggled, this, [this](bool enabled) {
         if (enabled) {
-            // 先读取端口；服务器开始监听，客户端主动连接。
             const quint16 port = ui->netlineEdithost->text().toUShort();
             m_tcpmanger->start(isServerMode, ui->netlineEditip->text(), port);
         } else {
             m_tcpmanger->stop();
             m_tcpphraser->reset();
         }
-        // 更新开关图标；联网期间锁定模式、IP 和端口，并启用 LED 按钮。
+        // 开关开启期间锁定连接参数；开关状态不等于连接成功。
         ui->actionNetworkSwitch->setIcon(QIcon(enabled ? ":/img/open.png" : ":/img/close.png"));
         ui->actionNetworkSwitch->setToolTip(enabled ? "网络已开启；点击关闭" : "网络已关闭；点击开启");
         ui->actionnetbtn->setEnabled(!enabled);
@@ -105,12 +109,11 @@ MainWindow::MainWindow(QWidget *parent)
         ui->netlineEditip->setEnabled(!enabled);
         ui->netlineEdithost->setEnabled(!enabled);
     });
-    // 7. 调试按钮：显示收发消息的调试窗口。
     connect(ui->actiondebug, &QAction::triggered, this, [&](){
             m_form->show();
     });
 
-    // 8. 解析完成：保存最新的六项数值供曲线使用，同时更新界面标签。
+    // 有效数据立即更新标签，入库交给数据库线程，曲线由定时器刷新。
     connect(m_tcpphraser, &TcpPhraser::sensorDataParsed,
             this, [this](double temp,
                          double humi,
@@ -128,8 +131,7 @@ MainWindow::MainWindow(QWidget *parent)
         ui->smokeValueLabel->setText(QString::number(mq2));
         ui->rainValueLabel->setText(QString::number(rain));
 
-        if (m_databasemanger->insert(m_sensorData))
-            refreshHistory();
+        emit saveRequested(m_sensorData);
     });
 
 
@@ -137,16 +139,18 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    m_tcpmanger->stop();
+    // 将退出排在已提交的数据库任务后面，避免尚未保存就结束线程。
+    QMetaObject::invokeMethod(m_databasemanger, [this]() {
+        m_thread->quit();
+    }, Qt::QueuedConnection);
+    m_thread->wait();
     delete ui;
 }
 
-// 查询全部记录，替换表格中的旧数据。
-void MainWindow::refreshHistory()
+// 查询在工作线程完成，这里只在主线程更新模型。
+void MainWindow::refreshHistory(const QList<QVariantMap> &rows)
 {
-    QList<QVariantMap> rows;
-    if (!m_databasemanger->select(rows))
-        return;
-
     auto model = m_history->get_model();
     model->setRowCount(0); // 清空旧数据，保留表头。
     for (const auto &row : rows) {

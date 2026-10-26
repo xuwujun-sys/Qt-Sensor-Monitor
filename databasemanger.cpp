@@ -3,7 +3,6 @@
 
 DataBaseManger::DataBaseManger(QObject *parent) : QObject(parent)
 {
-    init();
 }
 
 DataBaseManger::~DataBaseManger()
@@ -16,6 +15,7 @@ DataBaseManger::~DataBaseManger()
 
 void DataBaseManger::init()
 {
+    // 每个实例使用独立连接名，避免多个对象共用默认连接。
     m_db = QSqlDatabase::addDatabase("QODBC", QUuid::createUuid().toString());
     m_db.setDatabaseName("Driver={MySQL ODBC 8.0 Unicode Driver};"
                        "Server=127.0.0.1;Port=3306;Database=testindex;");
@@ -25,7 +25,28 @@ void DataBaseManger::init()
 
 bool DataBaseManger::open()
 {
+    if (!m_db.isValid())
+        init(); // 在实际调用 open() 的线程创建连接。
     return m_db.open();
+}
+
+void DataBaseManger::initialize()
+{
+    if (open())
+        queryData();
+}
+
+void DataBaseManger::saveData(SensorData data)
+{
+    if (insert(data))
+        queryData();
+}
+
+void DataBaseManger::queryData()
+{
+    QList<QVariantMap> rows;
+    if (select(rows))
+        emit dataReady(rows);
 }
 
 bool DataBaseManger::insert(const SensorData &data)
@@ -58,6 +79,7 @@ bool DataBaseManger::remove(int id)
 bool DataBaseManger::execute(QSqlQuery &query, const QString &sql,
                             const QVariantMap &values)
 {
+    // 数值通过参数绑定传入，不直接拼接进 SQL。
     query.prepare(sql);
 
     for (auto it = values.constBegin(); it != values.constEnd(); ++it)
@@ -71,6 +93,7 @@ bool DataBaseManger::select(QList<QVariantMap> &rows)
     rows.clear();
     QSqlQuery query(m_db);
 
+    // 最新记录优先，同一采集时间按 id 排序。
     bool result = query.exec(
         "SELECT * FROM sensordata "
         "ORDER BY collect_time DESC, id DESC"

@@ -46,7 +46,7 @@ void TcpPhraser::analyze()
 
         m_buffer.remove(0, end + 1);
 
-        parseFrame(body);  // 解析这一条的六个字段
+        parseFrame(body);
     }
 }
 
@@ -60,19 +60,19 @@ void TcpPhraser::parseFrame(const QByteArray &body)
             continue;  // 跳过末尾逗号产生的空项
 
         const auto pair = field.split(':');
-        // 先检查格式，再访问 pair[1]，避免字段没有冒号时越界。
+        // 先检查“字段:数值”格式，避免访问不存在的 pair[1]。
         if (pair.size() != 2 || pair[0].trimmed().isEmpty())
             return;
 
         bool ok = false;
         const double value = pair[1].toDouble(&ok);
         if (!ok || !qIsFinite(value))
-            return; // 非数字、空数值、NaN 和无穷大都不接收，正常的 0 可以接收。
+            return; // 拒绝无效数值；合法的 0 仍可通过。
 
         values[pair[0].trimmed()] = value;
     }
 
-    // 六项数据必须齐全，不能让缺少的字段默认为 0。
+    // 六项必须齐全，避免缺失字段被当成 0 显示或入库。
     const char* keys[] = {"temp", "humi", "light", "soil", "mq2", "rain"};
     for (const char* key : keys) {
         if (!values.contains(key))

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QThread>
 #include "form.h"
 #include "tcpmanger.h"
 #include "tcpphraser.h"
@@ -14,33 +15,39 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+// 连接界面、通信、解析、曲线和数据库，协调数据流转。
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    MainWindow(QWidget *parent = nullptr); // 创建界面和各功能对象，连接信号与槽。
+    ~MainWindow(); // 释放 UI；以主窗口为父对象的功能对象由 Qt 自动释放。
+
+signals:
+    void saveRequested(SensorData data); // 向数据库线程提交保存任务。
+    void queryRequested(); // 向数据库线程提交查询任务。
 
 private:
     // 窗口
-    Ui::MainWindow *ui;          // 主窗口里的按钮、标签、图表等控件
-    Form* m_form;               // 收发消息用的调试窗口
-    HistoryWidget* m_history;
+    Ui::MainWindow *ui;       // 访问主窗口的按钮、标签、输入框等控件。
+    Form* m_form;             // 显示原始收发消息的调试窗口。
+    HistoryWidget* m_history; // 显示数据库记录的历史窗口。
 
     // 网络通信
-    bool isServerMode = false;  // false：客户端模式；true：服务器模式
-    Tcpmanger* m_tcpmanger;     // 负责连接、监听、收发和关闭网络。
+    bool isServerMode = false; // false 为客户端，true 为服务器，不代表连接状态。
+    Tcpmanger* m_tcpmanger;    // 执行网络启停、接收与发送。
 
     // 传感器数据
-    TcpPhraser* m_tcpphraser;    // 把收到的消息解析成六项传感器数值
-    SensorData m_sensorData{};  // 保存最近一次收到的六项数值
-    bool m_hasSensorData = false; // 收到第一组数据后为 true，曲线才开始画
+    TcpPhraser* m_tcpphraser;   // 缓存收到的字节，解析有效的传感器报文。
+    SensorData m_sensorData{};  // 最近一次有效数据，供定时绘图使用。
+    bool m_hasSensorData = false; // 收到过有效数据后开始绘图，断网时不清除此标志。
 
-    // 实时曲线：负责两个图表，定时刷新仍由主窗口安排。
-    SensorChart* m_sensorchart;
+    // 绘图与数据存储
+    SensorChart* m_sensorchart; // 创建并更新两张实时曲线图。
 
-    DataBaseManger* m_databasemanger;
-    void refreshHistory(); // 查询数据库并刷新历史表格。
+    DataBaseManger* m_databasemanger; // 无父对象，在线程结束时自动释放。
+    QThread* m_thread; // 数据库工作线程，退出前等待任务处理完毕。
+    void refreshHistory(const QList<QVariantMap> &rows); // 在主线程将查询结果填入表格。
 };
 #endif // MAINWINDOW_H

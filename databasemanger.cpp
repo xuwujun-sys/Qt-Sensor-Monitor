@@ -7,6 +7,7 @@ DataBaseManger::DataBaseManger(QObject *parent) : QObject(parent)
 
 DataBaseManger::~DataBaseManger()
 {
+    // 先释放本对象的数据库句柄，再从 Qt 连接池移除对应连接。
     const QString connectionName = m_db.connectionName();
     m_db.close();
     m_db = QSqlDatabase();
@@ -32,18 +33,21 @@ bool DataBaseManger::open()
 
 void DataBaseManger::initialize()
 {
+    // 线程启动后加载一次历史数据；连接失败时不会发出 dataReady。
     if (open())
         queryData();
 }
 
 void DataBaseManger::saveData(SensorData data)
 {
+    // 每次保存成功后重新查询，使历史窗口同步最新记录。
     if (insert(data))
         queryData();
 }
 
 void DataBaseManger::queryData()
 {
+    // 查询结果通过信号回到主线程，本线程不直接更新表格控件。
     QList<QVariantMap> rows;
     if (select(rows))
         emit dataReady(rows);
@@ -51,6 +55,7 @@ void DataBaseManger::queryData()
 
 bool DataBaseManger::insert(const SensorData &data)
 {
+    // 仅写入六项传感器值，id 和 collect_time 使用数据库表的默认生成规则。
     QSqlQuery query(m_db);
     return execute(query, "INSERT INTO sensordata "
                   "(temperature, humidity, light, soil, smoke, rain) "
@@ -62,6 +67,7 @@ bool DataBaseManger::insert(const SensorData &data)
 
 bool DataBaseManger::update(int id, const SensorData &data)
 {
+    // 提供按 id 修改记录的底层接口，目前主窗口尚未接入编辑操作。
     QSqlQuery query(m_db);
     return execute(query, "UPDATE sensordata SET temperature=:temperature, humidity=:humidity, "
                   "light=:light, soil=:soil, smoke=:smoke, rain=:rain WHERE id=:id",
@@ -72,6 +78,7 @@ bool DataBaseManger::update(int id, const SensorData &data)
 
 bool DataBaseManger::remove(int id)
 {
+    // 提供按 id 删除单条记录的底层接口，目前主窗口尚未接入删除操作。
     QSqlQuery query(m_db);
     return execute(query, "DELETE FROM sensordata WHERE id=:id", {{":id", id}});
 }

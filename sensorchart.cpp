@@ -10,6 +10,7 @@ SensorChart::SensorChart(QObject *parent) : QObject(parent)
 
 void SensorChart::initCharts(QtCharts::QChartView *view1, QtCharts::QChartView *view2)
 {
+    // 两张图各显示三项数据，数组顺序与 SensorData 到 values[] 的映射保持一致。
     QtCharts::QChartView* views[] = {view1, view2};
     const QString names[] = {QStringLiteral("温度"), QStringLiteral("空气湿度"),
                              QStringLiteral("光照"), QStringLiteral("土壤湿度"),
@@ -30,6 +31,7 @@ void SensorChart::initCharts(QtCharts::QChartView *view1, QtCharts::QChartView *
         chart->addAxis(axisX, Qt::AlignBottom);
         m_timeAxes[chartIndex] = axisX;
 
+        // 同一张图的三条线共用纵轴，当前固定显示 0~100，不自动按数据缩放。
         auto axisY = new QtCharts::QValueAxis;
         axisY->setRange(0, 100);
         axisY->setTickCount(5);
@@ -50,6 +52,7 @@ void SensorChart::initCharts(QtCharts::QChartView *view1, QtCharts::QChartView *
 
 void SensorChart::appendData(const SensorData &data)
 {
+    // 主窗口每秒调用一次；时间戳取绘图时刻，而非报文到达或数据库采集时刻。
     const QDateTime now = QDateTime::currentDateTime();
     // 第一笔数据作为起点，先从左往右画满一分钟。
     if (m_series[0]->count() == 0) {

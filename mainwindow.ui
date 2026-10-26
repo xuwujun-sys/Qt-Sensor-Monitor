@@ -210,10 +210,10 @@
                <item>
                 <widget class="QPushButton" name="refreshSerialPortsButton">
                  <property name="enabled">
-                  <bool>false</bool>
+                  <bool>true</bool>
                  </property>
                  <property name="toolTip">
-                  <string>串口功能待接入</string>
+                  <string>刷新可用串口</string>
                  </property>
                  <property name="text">
                   <string>刷新</string>
@@ -225,7 +225,7 @@
              <item>
               <widget class="QLabel" name="serialHintLabel">
                <property name="text">
-                <string>串口收发功能待接入</string>
+                <string>串口已关闭</string>
                </property>
               </widget>
              </item>

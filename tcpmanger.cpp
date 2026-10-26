@@ -6,8 +6,10 @@ Tcpmanger::Tcpmanger(QObject *parent)
     , m_server(new QTcpServer(this))
     , m_socket(new QTcpSocket(this))
 {
+    // 设备通信使用直连，不经过系统网络代理。
     m_socket->setProxy(QNetworkProxy::NoProxy);
 
+    // 客户端接收入口；服务端各连接的接收入口在 newConnection 中设置。
     connect(m_socket, &QTcpSocket::readyRead, this, [this]() {
         emit dataReceived(m_socket->readAll());
     });
@@ -39,6 +41,8 @@ void Tcpmanger::start(bool isServerMode, const QString &ip, quint16 port)
     stop();
     m_isServerMode = isServerMode;
     m_enabled = true;
+    // 服务器的 ip/port 是本地监听地址；客户端的 ip/port 是远端服务器地址。
+    // 此处不等待连接完成；m_enabled 只表示用户请求开启。
     if (m_isServerMode)
         m_server->listen(QHostAddress(ip), port);
     else
@@ -50,6 +54,7 @@ void Tcpmanger::stop()
     m_enabled = false;
     m_server->close();
     m_socket->abort();
+    // abort() 可能触发 disconnected 并修改原列表，因此遍历副本。
     const auto sockets = m_socket_l;
     m_socket_l.clear();
     for (auto socket : sockets)

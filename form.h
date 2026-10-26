@@ -26,7 +26,7 @@ private:
     Ui::Form *ui; // 访问接收区、发送区和按钮。
 
 signals:
-    void sendmsg(QByteArray msg); // 请求发送原始字节，实际 TCP 发送由 Tcpmanger 处理。
+    void sendmsg(QByteArray msg); // 请求发送原始字节，由主窗口选择 TCP 或串口发送。
 };
 
 #endif // FORM_H

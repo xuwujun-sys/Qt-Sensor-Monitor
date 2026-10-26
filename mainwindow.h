@@ -5,6 +5,7 @@
 #include <QThread>
 #include "form.h"
 #include "tcpmanger.h"
+#include "serialmanger.h"
 #include "tcpphraser.h"
 #include "sensordata.h"
 #include "sensorchart.h"
@@ -16,6 +17,8 @@ namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 // 连接界面、通信、解析、曲线和数据库，协调数据流转。
+// TCP 接收 -> 调试显示、协议解析 -> 数值标签、数据库；定时器用最新数值绘图。
+// 串口接收 -> 调试显示；调试发送 -> 根据通信下拉框选择 TCP 或串口。
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -34,9 +37,13 @@ private:
     Form* m_form;             // 显示原始收发消息的调试窗口。
     HistoryWidget* m_history; // 显示数据库记录的历史窗口。
 
-    // 网络通信
+    // 通信管理：底层类负责收发，主窗口负责读取配置和更新控件状态。
     bool isServerMode = false; // false 为客户端，true 为服务器，不代表连接状态。
     Tcpmanger* m_tcpmanger;    // 执行网络启停、接收与发送。
+    SerialManger* m_serialmanger; // 管理串口，使用界面选择的端口和波特率。
+    void refreshSerialPorts(); // 刷新串口列表。
+    void toggleCommunication(bool enabled); // 按所选方式打开或关闭通信。
+    void sendDebugData(const QByteArray &data); // 调试消息发送到当前通信方式。
 
     // 传感器数据
     TcpPhraser* m_tcpphraser;   // 缓存收到的字节，解析有效的传感器报文。

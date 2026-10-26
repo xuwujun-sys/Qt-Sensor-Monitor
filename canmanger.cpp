@@ -2,6 +2,7 @@
 #include <QCanBus>
 #include <QVariant>
 
+// CAN 收发封装目前未接入 MainWindow；此文件提供独立的通道和帧操作能力。
 CanManger::CanManger(QObject *parent) : QObject(parent)
 {
 }
@@ -18,6 +19,7 @@ QStringList CanManger::plugins() const
 
 bool CanManger::open(const QString &plugin, const QString &interface, int bitRate)
 {
+    // plugin 指 Qt CAN 后端，interface 指该后端的设备通道；重新打开前先释放旧设备。
     close();
     m_device = QCanBus::instance()->createDevice(plugin, interface);
     if (!m_device)
@@ -40,6 +42,7 @@ void CanManger::close()
 {
     if (!m_device)
         return;
+    // 先断开信号，避免设备关闭过程中继续回调；deleteLater 延后安全释放。
     disconnect(m_device, nullptr, this, nullptr);
     m_device->disconnectDevice();
     m_device->deleteLater();

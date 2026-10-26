@@ -1,4 +1,4 @@
-QT       += core gui charts network sql
+QT       += core gui charts network sql serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -9,6 +9,7 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    serialmanger.cpp \
     tcpmanger.cpp \
     sensorchart.cpp \
     databasemanger.cpp \
@@ -19,6 +20,7 @@ SOURCES += \
     tcpphraser.cpp
 
 HEADERS += \
+    serialmanger.h \
     tcpmanger.h \
     sensorchart.h \
     databasemanger.h \

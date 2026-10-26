@@ -57,6 +57,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->netlineEditip->setText("127.0.0.1");
     ui->netlineEdithost->setText("9494");
 
+    // 串口页目前仅完成布局，禁用 TCP 开关，避免误启动网络。
+    connect(ui->communicationComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this](int index) {
+        ui->actionNetworkSwitch->setEnabled(index == 0);
+        ui->actionnetbtn->setEnabled(index == 0);
+    });
+
     // 模式按钮只选择角色，网络由总开关启动。
     connect(ui->actionnetbtn, &QAction::triggered, this, [this]() {
         isServerMode = !isServerMode;
@@ -108,6 +115,7 @@ MainWindow::MainWindow(QWidget *parent)
         ui->setLightButton->setEnabled(enabled);
         ui->netlineEditip->setEnabled(!enabled);
         ui->netlineEdithost->setEnabled(!enabled);
+        ui->communicationComboBox->setEnabled(!enabled);
     });
     connect(ui->actiondebug, &QAction::triggered, this, [&](){
             m_form->show();
